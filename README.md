@@ -1,5 +1,7 @@
 # Clue
 
+![Clue — sticky notes for AI agents in Figma](cover.png)
+
 **Sticky notes for AI agents in Figma. Because without them, they have no clue.**
 
 Clue is a two-part system for bridging Figma and AI coding agents:
