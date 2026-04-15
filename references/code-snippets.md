@@ -65,23 +65,6 @@ The `ancestors` array is ordered inner → outer (immediate parent first, top-le
 - `ROOT_ID = page ID` → scans that page only
 - `ROOT_ID = frame ID` → scans only descendants of that frame
 
-## Complete — mark note done with resolution
-
-```js
-var node = await figma.getNodeByIdAsync("NODE_ID");
-var raw = node.getSharedPluginData("clue", "note");
-var noteData;
-try { noteData = JSON.parse(raw); } catch(e) { noteData = { text: raw, createdAt: "" }; }
-var doneData = JSON.stringify({
-  text: noteData.text,
-  resolution: "SHORT DESCRIPTION OF WHAT WAS DONE",
-  createdAt: noteData.createdAt || "",
-  completedAt: new Date().toISOString()
-});
-node.setSharedPluginData("clue", "done", doneData);
-node.setSharedPluginData("clue", "note", "");
-```
-
 ## Inspect text nodes (safe traversal)
 
 ```js
@@ -99,18 +82,40 @@ walk(node);
 return texts;
 ```
 
-Note: always check `"children" in n` before accessing — leaf nodes like ELLIPSE throw otherwise.
+Always check `"children" in n` before recursing — leaf nodes like `ELLIPSE` throw otherwise.
 
 ## Detach instance before editing
+
+Use this when the user asked for an edit to an instance and the change would modify structure or content beyond a simple override. Detaching protects the shared master component from accidental propagation.
 
 ```js
 var node = await figma.getNodeByIdAsync("NODE_ID");
 if (node.type === "INSTANCE") {
-  node.detachInstance();
+  var frame = node.detachInstance();
+  // `frame` is a brand-new FrameNode — use it for all further edits
+  frame.name = "New name";
 }
 ```
 
-Note: after `detachInstance()`, the node becomes a regular `FRAME`. Proceed with edits on it directly.
+**`detachInstance()` is destructive.** It deletes the original instance and returns a *new* `FrameNode` with a *new* ID. Get this wrong and every subsequent lookup silently returns `null`:
+
+```js
+// WRONG — the old ID is dead after detach
+var id = inst.id;
+inst.detachInstance();
+var node = await figma.getNodeByIdAsync(id); // returns null!
+
+// CORRECT — use the return value directly
+var frame = inst.detachInstance();
+frame.name = "New name"; // works
+```
+
+The rules, with the reasoning:
+
+- **Capture the return value** of `detachInstance()`. It's the only valid reference to the post-detach node.
+- **Never re-fetch by the old ID.** The old ID belongs to a deleted node; the lookup returns `null`.
+- **Don't cache a reference to the instance before detaching.** The in-memory reference is invalidated along with the node itself.
+- **Detach and modify in the same scope.** Don't detach in one loop and modify in another — if the reference doesn't survive the loop boundary, the second loop has nothing to work with.
 
 ## QuickJS rules
 
