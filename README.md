@@ -6,7 +6,7 @@
 
 Clue is a two-part system for bridging Figma and AI coding agents:
 
-1. **[Clue Figma plugin](https://www.figma.com/community/plugin/TODO)** — designers leave inline sticky notes on any frame or section.
+1. **[Clue Figma plugin](https://www.figma.com/community/plugin/1626398221121985554)** — designers leave inline sticky notes on any frame or section.
 2. **Clue Claude Code skill** — this repo. Lets your agent find those notes, understand each one in context, and report back in chat about what they mean.
 
 ## Why Clue exists
@@ -21,7 +21,7 @@ You need all three of these installed and working together:
 
 - A coding agent with tool access — [Claude Code](https://claude.com/claude-code), Codex CLI, Cursor, or any CLI/IDE agent that can call MCP servers and read skill folders.
 - The [Figma MCP server](https://help.figma.com/hc/en-us/articles/32132100833559) — so your agent can query your Figma file, read nodes, and export assets.
-- The [Clue Figma plugin](https://www.figma.com/community/plugin/TODO) — installed in your Figma workspace so you can leave notes in the first place.
+- The [Clue Figma plugin](https://www.figma.com/community/plugin/1626398221121985554) — installed in your Figma workspace so you can leave notes in the first place.
 
 Without the plugin, there are no notes. Without Figma MCP, your agent can't see your file. Without this skill, your agent won't know Clue exists. Install all three.
 
